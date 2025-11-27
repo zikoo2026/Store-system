@@ -1,0 +1,426 @@
+{% extends 'store_system/base.html' %}
+
+{% block title %}المواد - نظام المخازن المدرسية{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card" style="background: linear-gradient(135deg, rgba(240, 147, 251, 0.1) 0%, rgba(245, 87, 108, 0.1) 100%); border: none;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-wrapper warning me-3">
+                            <i class="fas fa-boxes"></i>
+                        </div>
+                        <div>
+                            <h1 class="mb-1 fw-bold">إدارة المواد</h1>
+                            <p class="text-muted mb-0">عرض وإدارة جميع المواد والأصناف في النظام</p>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-3 mt-md-0">
+                        <a href="/admin/store_system/item/add/" class="btn btn-success">
+                            <i class="fas fa-plus me-2"></i>إضافة مادة جديدة
+                        </a>
+                        <a href="{% url 'store_system:index' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-home me-2"></i>العودة للرئيسية
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Row -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card warning text-center">
+            <div class="card-body">
+                <div class="icon-wrapper warning mx-auto mb-2" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                    <i class="fas fa-boxes"></i>
+                </div>
+                <h4 class="stats-number mb-1" style="font-size: 2rem;">{{ items.count }}</h4>
+                <p class="text-muted small mb-0">إجمالي المواد</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card text-center">
+            <div class="card-body">
+                <div class="icon-wrapper mx-auto mb-2" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                    <i class="fas fa-tags"></i>
+                </div>
+                <h4 class="stats-number mb-1" style="font-size: 2rem;">{{ categories_count }}</h4>
+                <p class="text-muted small mb-0">التصنيفات المستخدمة</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card success text-center">
+            <div class="card-body">
+                <div class="icon-wrapper success mx-auto mb-2" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h4 class="stats-number mb-1" style="font-size: 2rem;">{{ items.count }}</h4>
+                <p class="text-muted small mb-0">المواد النشطة</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card text-center">
+            <div class="card-body">
+                <div class="icon-wrapper mx-auto mb-2" style="width: 50px; height: 50px; font-size: 1.2rem; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <h4 class="stats-number mb-1" style="font-size: 2rem;">100%</h4>
+                <p class="text-muted small mb-0">معدل التوفر</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter and Search -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control" placeholder="البحث في المواد..." id="searchInput">
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <select class="form-select" id="categoryFilter">
+                            <option value="">جميع التصنيفات</option>
+                            {% for item in items %}
+                                {% if item.category.category_name not in selected_categories %}
+                                    <option value="{{ item.category.category_name }}">{{ item.category.category_name }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                            <i class="fas fa-times me-2"></i>مسح الفلاتر
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Items Grid View -->
+<div class="row mb-4" id="itemsGrid">
+    {% if items %}
+        {% for item in items %}
+        <div class="col-lg-4 col-md-6 mb-4 item-card" data-category="{{ item.category.category_name }}">
+            <div class="card item-card-inner h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="icon-wrapper warning me-3" style="width: 45px; height: 45px; font-size: 1.1rem;">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="card-title fw-bold mb-1">{{ item.item_name }}</h6>
+                            <p class="text-muted small mb-2">مادة رقم {{ item.item_id }}</p>
+                            <span class="badge bg-primary">{{ item.category.category_name }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="row text-center mb-3">
+                        <div class="col-6">
+                            <div class="border-end">
+                                <h6 class="text-info mb-0">{{ item.unit }}</h6>
+                                <small class="text-muted">الوحدة</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h6 class="text-success mb-0">متوفر</h6>
+                            <small class="text-muted">الحالة</small>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="/admin/store_system/item/{{ item.item_id }}/change/" 
+                           class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-edit me-2"></i>تعديل المادة
+                        </a>
+                        <a href="/admin/store_system/item/{{ item.item_id }}/" 
+                           class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-eye me-2"></i>عرض التفاصيل
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<!-- Items Table View -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>قائمة المواد التفصيلية
+                    </h5>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-primary active" onclick="showTableView()">
+                            <i class="fas fa-table me-1"></i>جدول
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" onclick="showGridView()">
+                            <i class="fas fa-th me-1"></i>شبكة
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                {% if items %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="itemsTable">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" style="width: 80px;">
+                                        <i class="fas fa-hashtag me-1"></i>المعرف
+                                    </th>
+                                    <th>
+                                        <i class="fas fa-box me-1"></i>اسم المادة
+                                    </th>
+                                    <th class="text-center" style="width: 100px;">
+                                        <i class="fas fa-ruler me-1"></i>الوحدة
+                                    </th>
+                                    <th class="text-center" style="width: 150px;">
+                                        <i class="fas fa-tag me-1"></i>التصنيف
+                                    </th>
+                                    <th class="text-center" style="width: 100px;">
+                                        <i class="fas fa-info-circle me-1"></i>الحالة
+                                    </th>
+                                    <th class="text-center" style="width: 150px;">
+                                        <i class="fas fa-cogs me-1"></i>الإجراءات
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in items %}
+                                <tr class="item-row" data-category="{{ item.category.category_name }}">
+                                    <td class="text-center fw-bold">
+                                        <span class="badge bg-warning">{{ item.item_id }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="icon-wrapper warning me-3" style="width: 35px; height: 35px; font-size: 0.9rem;">
+                                                <i class="fas fa-box"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 fw-bold">{{ item.item_name }}</h6>
+                                                <small class="text-muted">مادة رقم {{ item.item_id }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-info">{{ item.unit }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-primary">{{ item.category.category_name }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check me-1"></i>متوفر
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <a href="/admin/store_system/item/{{ item.item_id }}/change/" 
+                                               class="btn btn-sm btn-outline-primary" title="تعديل">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="/admin/store_system/item/{{ item.item_id }}/" 
+                                               class="btn btn-sm btn-outline-info" title="عرض">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <div class="icon-wrapper warning mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2rem; opacity: 0.5;">
+                            <i class="fas fa-boxes"></i>
+                        </div>
+                        <h4 class="text-muted mb-3">لا توجد مواد مسجلة</h4>
+                        <p class="text-muted mb-4">ابدأ بإضافة مادة جديدة لتنظيم المخزون في النظام</p>
+                        <a href="/admin/store_system/item/add/" class="btn btn-success btn-lg">
+                            <i class="fas fa-plus me-2"></i>إضافة أول مادة
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+{% if items %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-bolt me-2"></i>إجراءات سريعة
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <a href="/admin/store_system/item/add/" class="btn btn-outline-success w-100">
+                            <i class="fas fa-plus me-2"></i>إضافة مادة
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'store_system:categories' %}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-tags me-2"></i>عرض التصنيفات
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'store_system:warehouses' %}" class="btn btn-outline-info w-100">
+                            <i class="fas fa-building me-2"></i>عرض المستودعات
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="/admin/" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-cog me-2"></i>لوحة الإدارة
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<style>
+.item-card-inner {
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.item-card-inner:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.view-toggle {
+    display: none;
+}
+
+.grid-view .view-toggle.grid {
+    display: block;
+}
+
+.table-view .view-toggle.table {
+    display: block;
+}
+</style>
+
+<script>
+let selectedCategories = [];
+
+// Search functionality
+document.getElementById('searchInput').addEventListener('keyup', function() {
+    filterItems();
+});
+
+// Category filter
+document.getElementById('categoryFilter').addEventListener('change', function() {
+    filterItems();
+});
+
+function filterItems() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const selectedCategory = document.getElementById('categoryFilter').value;
+    
+    // Filter table rows
+    const tableRows = document.querySelectorAll('.item-row');
+    tableRows.forEach(row => {
+        const itemName = row.querySelector('h6').textContent.toLowerCase();
+        const category = row.getAttribute('data-category');
+        
+        const matchesSearch = itemName.includes(searchTerm);
+        const matchesCategory = !selectedCategory || category === selectedCategory;
+        
+        if (matchesSearch && matchesCategory) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    // Filter grid cards
+    const gridCards = document.querySelectorAll('.item-card');
+    gridCards.forEach(card => {
+        const itemName = card.querySelector('h6').textContent.toLowerCase();
+        const category = card.getAttribute('data-category');
+        
+        const matchesSearch = itemName.includes(searchTerm);
+        const matchesCategory = !selectedCategory || category === selectedCategory;
+        
+        if (matchesSearch && matchesCategory) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+function clearFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('categoryFilter').value = '';
+    filterItems();
+}
+
+function showTableView() {
+    document.getElementById('itemsGrid').style.display = 'none';
+    document.querySelector('.table-responsive').parentElement.style.display = 'block';
+    
+    // Update button states
+    document.querySelector('button[onclick="showTableView()"]').classList.add('active');
+    document.querySelector('button[onclick="showGridView()"]').classList.remove('active');
+}
+
+function showGridView() {
+    document.getElementById('itemsGrid').style.display = 'flex';
+    document.querySelector('.table-responsive').parentElement.style.display = 'none';
+    
+    // Update button states
+    document.querySelector('button[onclick="showGridView()"]').classList.add('active');
+    document.querySelector('button[onclick="showTableView()"]').classList.remove('active');
+}
+
+// Add hover effects to table rows
+document.querySelectorAll('.item-row').forEach(row => {
+    row.addEventListener('mouseenter', function() {
+        this.style.transform = 'scale(1.01)';
+        this.style.transition = 'all 0.2s ease';
+    });
+    
+    row.addEventListener('mouseleave', function() {
+        this.style.transform = 'scale(1)';
+    });
+});
+
+// Initialize with table view
+showTableView();
+</script>
+{% endblock %}

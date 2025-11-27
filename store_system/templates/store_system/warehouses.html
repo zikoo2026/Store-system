@@ -1,0 +1,307 @@
+{% extends 'store_system/base.html' %}
+
+{% block title %}المستودعات - نظام المخازن المدرسية{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card" style="background: linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%); border: none;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-wrapper success me-3">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div>
+                            <h1 class="mb-1 fw-bold">إدارة المستودعات</h1>
+                            <p class="text-muted mb-0">عرض وإدارة جميع المستودعات في النظام</p>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-3 mt-md-0">
+                        <a href="/admin/store_system/warehouse/add/" class="btn btn-success">
+                            <i class="fas fa-plus me-2"></i>إضافة مستودع جديد
+                        </a>
+                        <a href="{% url 'store_system:index' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-home me-2"></i>العودة للرئيسية
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Row -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card success text-center">
+            <div class="card-body">
+                <div class="icon-wrapper success mx-auto mb-2" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                    <i class="fas fa-building"></i>
+                </div>
+                <h4 class="stats-number mb-1" style="font-size: 2rem;">{{ warehouses.count }}</h4>
+                <p class="text-muted small mb-0">إجمالي المستودعات</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card text-center">
+            <div class="card-body">
+                <div class="icon-wrapper mx-auto mb-2" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h4 class="stats-number mb-1" style="font-size: 2rem;">{{ warehouses.count }}</h4>
+                <p class="text-muted small mb-0">المستودعات النشطة</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card warning text-center">
+            <div class="card-body">
+                <div class="icon-wrapper warning mx-auto mb-2" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                    <i class="fas fa-boxes"></i>
+                </div>
+                <h4 class="stats-number mb-1" style="font-size: 2rem;">-</h4>
+                <p class="text-muted small mb-0">المواد المخزنة</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card text-center">
+            <div class="card-body">
+                <div class="icon-wrapper mx-auto mb-2" style="width: 50px; height: 50px; font-size: 1.2rem; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <h4 class="stats-number mb-1" style="font-size: 2rem;">100%</h4>
+                <p class="text-muted small mb-0">معدل الاستغلال</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Warehouses Grid -->
+<div class="row mb-4">
+    {% if warehouses %}
+        {% for warehouse in warehouses %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card warehouse-card h-100">
+                <div class="card-body text-center">
+                    <div class="icon-wrapper success mx-auto mb-3">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <h5 class="card-title fw-bold mb-2">{{ warehouse.warehouse_name }}</h5>
+                    <p class="text-muted mb-3">مستودع رقم {{ warehouse.warehouse_id }}</p>
+                    
+                    <div class="row text-center mb-3">
+                        <div class="col-6">
+                            <div class="border-end">
+                                <h6 class="text-primary mb-0">-</h6>
+                                <small class="text-muted">المواد</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h6 class="text-success mb-0">نشط</h6>
+                            <small class="text-muted">الحالة</small>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="/admin/store_system/warehouse/{{ warehouse.warehouse_id }}/change/" 
+                           class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-edit me-2"></i>تعديل المستودع
+                        </a>
+                        <a href="/admin/store_system/warehouse/{{ warehouse.warehouse_id }}/" 
+                           class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-eye me-2"></i>عرض التفاصيل
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<!-- Warehouses Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>قائمة المستودعات التفصيلية
+                    </h5>
+                    <div class="d-flex gap-2">
+                        <div class="input-group" style="width: 300px;">
+                            <input type="text" class="form-control" placeholder="البحث في المستودعات..." id="searchInput">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                {% if warehouses %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="warehousesTable">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" style="width: 80px;">
+                                        <i class="fas fa-hashtag me-1"></i>المعرف
+                                    </th>
+                                    <th>
+                                        <i class="fas fa-building me-1"></i>اسم المستودع
+                                    </th>
+                                    <th class="text-center" style="width: 120px;">
+                                        <i class="fas fa-boxes me-1"></i>عدد المواد
+                                    </th>
+                                    <th class="text-center" style="width: 120px;">
+                                        <i class="fas fa-info-circle me-1"></i>الحالة
+                                    </th>
+                                    <th class="text-center" style="width: 150px;">
+                                        <i class="fas fa-cogs me-1"></i>الإجراءات
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for warehouse in warehouses %}
+                                <tr class="warehouse-row">
+                                    <td class="text-center fw-bold">
+                                        <span class="badge bg-success">{{ warehouse.warehouse_id }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="icon-wrapper success me-3" style="width: 35px; height: 35px; font-size: 0.9rem;">
+                                                <i class="fas fa-building"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 fw-bold">{{ warehouse.warehouse_name }}</h6>
+                                                <small class="text-muted">مستودع رقم {{ warehouse.warehouse_id }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-info">-</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check me-1"></i>نشط
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <a href="/admin/store_system/warehouse/{{ warehouse.warehouse_id }}/change/" 
+                                               class="btn btn-sm btn-outline-primary" title="تعديل">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="/admin/store_system/warehouse/{{ warehouse.warehouse_id }}/" 
+                                               class="btn btn-sm btn-outline-info" title="عرض">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <div class="icon-wrapper success mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2rem; opacity: 0.5;">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <h4 class="text-muted mb-3">لا توجد مستودعات مسجلة</h4>
+                        <p class="text-muted mb-4">ابدأ بإضافة مستودع جديد لتنظيم المواد في النظام</p>
+                        <a href="/admin/store_system/warehouse/add/" class="btn btn-success btn-lg">
+                            <i class="fas fa-plus me-2"></i>إضافة أول مستودع
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+{% if warehouses %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-bolt me-2"></i>إجراءات سريعة
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <a href="/admin/store_system/warehouse/add/" class="btn btn-outline-success w-100">
+                            <i class="fas fa-plus me-2"></i>إضافة مستودع
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'store_system:items' %}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-boxes me-2"></i>عرض المواد
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'store_system:categories' %}" class="btn btn-outline-info w-100">
+                            <i class="fas fa-tags me-2"></i>عرض التصنيفات
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="/admin/" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-cog me-2"></i>لوحة الإدارة
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<style>
+.warehouse-card {
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.warehouse-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+</style>
+
+<script>
+// Search functionality
+document.getElementById('searchInput').addEventListener('keyup', function() {
+    const searchTerm = this.value.toLowerCase();
+    const rows = document.querySelectorAll('.warehouse-row');
+    
+    rows.forEach(row => {
+        const warehouseName = row.querySelector('h6').textContent.toLowerCase();
+        if (warehouseName.includes(searchTerm)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+// Add hover effects
+document.querySelectorAll('.warehouse-row').forEach(row => {
+    row.addEventListener('mouseenter', function() {
+        this.style.transform = 'scale(1.01)';
+        this.style.transition = 'all 0.2s ease';
+    });
+    
+    row.addEventListener('mouseleave', function() {
+        this.style.transform = 'scale(1)';
+    });
+});
+</script>
+{% endblock %}
